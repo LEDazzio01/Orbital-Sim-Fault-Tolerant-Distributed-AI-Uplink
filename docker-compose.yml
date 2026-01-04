@@ -13,7 +13,7 @@ services:
       - UPLINK_HOST=uplink-service
       - UPLINK_PORT=8001
     networks:
-      - terrestrial_mesh  # <--- ISOLATED
+      - terrestrial_mesh
 
   # 2. THE UPLINK (The Bridge/Chaos Proxy)
   # This is the ONLY service connected to both worlds.
@@ -36,33 +36,34 @@ services:
     build:
       context: ./orbital-node
       dockerfile: Dockerfile
+    # Load the Azure keys from the local .env file
+    env_file:
+      - .env
     # No public ports! It is not accessible from localhost.
     networks:
-      - orbital_mesh      # <--- ISOLATED
+      - orbital_mesh
     deploy:
       resources:
         limits:
-          [cite_start]cpus: '0.50'    # Simulate slower, rad-hardened CPU [cite: 433]
+          cpus: '0.50'    # Simulate slower, rad-hardened CPU
           memory: 512M    # Memory is heavy/expensive to launch
     depends_on:
       - uplink-service
 
   # Dev Container
   devcontainer:
-    [cite_start]image: mcr.microsoft.com/devcontainers/python:3.12 # Update to 3.12 per TDD 
+    image: mcr.microsoft.com/devcontainers/python:3.12
     volumes:
       - .:/workspace:cached
     command: sleep infinity
-    # Dev container needs access to everything for debugging, 
-    # but in prod, this wouldn't exist.
     networks:
       - terrestrial_mesh
       - orbital_mesh
 
-# 4. NETWORK TOPOLOGY [cite: 73, 74]
+# 4. NETWORK TOPOLOGY
 networks:
   terrestrial_mesh:
     driver: bridge
   orbital_mesh:
     driver: bridge
-    internal: true # Disables external internet access for the satellite (optional but realistic)
+    internal: true # Disables external internet access for the satellite
