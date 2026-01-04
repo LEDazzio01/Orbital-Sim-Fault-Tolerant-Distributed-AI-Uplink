@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Ground Station - FastAPI Service (The Client)
   ground-station:
