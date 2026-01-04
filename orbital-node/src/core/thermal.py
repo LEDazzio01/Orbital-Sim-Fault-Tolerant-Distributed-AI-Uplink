@@ -2,18 +2,18 @@ import math
 from pydantic import BaseModel, Field
 from typing import Optional
 
-# [cite_start]Constants derived from Starcloud White Paper [cite: 59, 370]
+# Constants derived from Starcloud White Paper
 STEFAN_BOLTZMANN_SIGMA = 5.67e-8
-[cite_start]DEEP_SPACE_TEMP_K = 3.0  # Effectively -270C [cite: 45, 244]
+DEEP_SPACE_TEMP_K = 3.0  # Effectively -270C
 
 class ThermalConfig(BaseModel):
     """Configuration for the Satellite Radiator System."""
-    [cite_start]mass_kg: float = Field(default=50.0, description="Total thermal mass of the node [cite: 66]")
-    [cite_start]specific_heat_j_kg_k: float = Field(default=900.0, description="Specific heat of Aluminum [cite: 66]")
-    [cite_start]surface_area_m2: float = Field(default=1.0, description="Radiator surface area [cite: 53, 371]")
-    [cite_start]emissivity: float = Field(default=0.92, description="Efficiency of radiator coating [cite: 59, 370]")
-    [cite_start]max_temp_k: float = Field(default=353.15, description="80C Safety Trip Limit [cite: 69]")
-    [cite_start]initial_temp_k: float = Field(default=293.15, description="Start at 20C [cite: 54]")
+    mass_kg: float = Field(default=50.0, description="Total thermal mass of the node")
+    specific_heat_j_kg_k: float = Field(default=900.0, description="Specific heat of Aluminum")
+    surface_area_m2: float = Field(default=1.0, description="Radiator surface area")
+    emissivity: float = Field(default=0.92, description="Efficiency of radiator coating")
+    max_temp_k: float = Field(default=353.15, description="80C Safety Trip Limit")
+    initial_temp_k: float = Field(default=293.15, description="Start at 20C")
 
 class ThermalThrottlingException(Exception):
     """Raised when the system exceeds safe operating temperature."""
@@ -33,7 +33,7 @@ class RadiatorSystem:
         """
         Calculates heat radiated to deep space using Stefan-Boltzmann Law.
         P = ε * σ * A * (T_rad^4 - T_space^4)
-        [cite_start]Reference White Paper Eq: P_emitted = 0.92 * 5.67e-8 * T^4 [cite: 370]
+        Reference White Paper Eq: P_emitted = 0.92 * 5.67e-8 * T^4
         """
         # We assume T_space is negligible compared to T_rad, but let's be precise.
         delta_t_4 = (self.current_temp_k**4) - (DEEP_SPACE_TEMP_K**4)
@@ -56,7 +56,7 @@ class RadiatorSystem:
         
         # 3. Calculate Temp Change (Energy = Mass * SpecificHeat * DeltaT)
         # DeltaT = (Power * Time) / (Mass * SpecificHeat)
-        [cite_start]thermal_mass = self.config.mass_kg * self.config.specific_heat_j_kg_k # [cite: 66]
+        thermal_mass = self.config.mass_kg * self.config.specific_heat_j_kg_k
         energy_joules = net_power * dt_seconds
         temp_delta = energy_joules / thermal_mass
         
@@ -68,7 +68,7 @@ class RadiatorSystem:
             # In a real system, hardware protection trips here.
             # We simulate this by rejecting the job.
             raise ThermalThrottlingException(
-                [cite_start]f"OVERHEAT WARNING: {self.current_temp_c:.2f}C exceeds limit {self.config.max_temp_k - 273.15}C [cite: 69]"
+                f"OVERHEAT WARNING: {self.current_temp_c:.2f}C exceeds limit {self.config.max_temp_k - 273.15}C"
             )
 
         return {

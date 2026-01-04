@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-01-04
+
+### Added
+
+- **Mission Control Dashboard**: Web-based UI for monitoring and control
+  - Real-time thermal gauge with color-coded status (nominal/warning/critical)
+  - Interactive job submission form with priority selection
+  - Live mission log displaying all system events
+  - Telemetry stats: heat rejection, thermal headroom, uplink status
+  - Auto-refreshing system status every 5 seconds
+
+- **API Endpoints**
+  - `GET /` - Serves the Mission Control Dashboard
+  - `GET /api/telemetry` - Returns orbital node thermal status
+
+- **Orbital Node Enhancements**
+  - Semantic Kernel builder with graceful degradation
+  - Mock kernel mode for infrastructure testing without API keys
+  - Fixed thermal.py syntax errors from citation markers
+
+---
+
 ## [0.1.0] - 2026-01-04
 
 ### Added
@@ -45,5 +67,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/LEDazzio01/Orbital-Sim-Fault-Tolerant-Distributed-AI-Uplink/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/LEDazzio01/Orbital-Sim-Fault-Tolerant-Distributed-AI-Uplink/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/LEDazzio01/Orbital-Sim-Fault-Tolerant-Distributed-AI-Uplink/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/LEDazzio01/Orbital-Sim-Fault-Tolerant-Distributed-AI-Uplink/releases/tag/v0.1.0

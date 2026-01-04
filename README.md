@@ -101,6 +101,7 @@ sequenceDiagram
 | **Language** | Python 3.12 (Strict typing, Pydantic validation) |
 | **AI Framework** | Microsoft Semantic Kernel (Azure OpenAI Integration) |
 | **Infrastructure** | Docker Compose (Isolated Networks) |
+| **Frontend** | Mission Control Dashboard (HTML5/CSS3/JavaScript) |
 | **Testing** | Pytest (Physics verification) |
 
 ---
@@ -128,9 +129,23 @@ AZURE_OPENAI_DEPLOYMENT_NAME=gpt-4
 docker-compose up --build
 ```
 
-### 4. Execute a Mission
+### 4. Access Mission Control
 
-Open a new terminal and act as the Client:
+Open your browser and navigate to:
+
+```
+http://localhost:8000
+```
+
+The **Mission Control Dashboard** provides:
+- 🌡️ Real-time thermal telemetry display
+- 🚀 Interactive job submission form
+- 📋 Live mission log with status updates
+- 📡 System health monitoring
+
+### 5. Execute a Mission (CLI)
+
+Alternatively, use curl to submit jobs directly:
 
 ```bash
 curl -X POST "http://localhost:8000/upload_job" \
