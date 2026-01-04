@@ -1,45 +1,68 @@
+version: '3.8'
+
 services:
-  # Ground Station - FastAPI Service (The Client)
+  # 1. GROUND STATION (The Client)
+  # Can ONLY see the Uplink. Cannot see the Node.
   ground-station:
     build:
       context: ./ground-station
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
+    environment:
+      - UPLINK_HOST=uplink-service
+      - UPLINK_PORT=8001
     networks:
-      - orbital-network
-    depends_on:
-      - uplink-service
+      - terrestrial_mesh  # <--- ISOLATED
 
-  # Uplink Service - Python/Rust Chaos Proxy (The Network Simulator)
+  # 2. THE UPLINK (The Bridge/Chaos Proxy)
+  # This is the ONLY service connected to both worlds.
   uplink-service:
     build:
       context: ./uplink-service
       dockerfile: Dockerfile
     ports:
       - "8001:8001"
+    environment:
+      - ORBITAL_NODE_HOST=orbital-node
+      - ORBITAL_NODE_PORT=8002
     networks:
-      - orbital-network
+      - terrestrial_mesh  # Incoming from Earth
+      - orbital_mesh      # Outgoing to Space
 
-  # Orbital Node - Semantic Kernel Worker (The Satellite)
+  # 3. ORBITAL NODE (The Satellite)
+  # Isolated in space. Constrained resources.
   orbital-node:
     build:
       context: ./orbital-node
       dockerfile: Dockerfile
+    # No public ports! It is not accessible from localhost.
     networks:
-      - orbital-network
+      - orbital_mesh      # <--- ISOLATED
+    deploy:
+      resources:
+        limits:
+          [cite_start]cpus: '0.50'    # Simulate slower, rad-hardened CPU [cite: 433]
+          memory: 512M    # Memory is heavy/expensive to launch
     depends_on:
       - uplink-service
 
-  # Dev Container for development
+  # Dev Container
   devcontainer:
-    image: mcr.microsoft.com/devcontainers/python:3.11
+    [cite_start]image: mcr.microsoft.com/devcontainers/python:3.12 # Update to 3.12 per TDD 
     volumes:
-      - ..:/workspace:cached
+      - .:/workspace:cached
     command: sleep infinity
+    # Dev container needs access to everything for debugging, 
+    # but in prod, this wouldn't exist.
     networks:
-      - orbital-network
+      - terrestrial_mesh
+      - orbital_mesh
 
+# 4. NETWORK TOPOLOGY [cite: 73, 74]
 networks:
-  orbital-network:
+  terrestrial_mesh:
     driver: bridge
+  orbital_mesh:
+    driver: bridge
+    internal: true # Disables external internet access for the satellite (optional but realistic)
