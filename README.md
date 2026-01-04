@@ -2,7 +2,39 @@
 
 **Orbital-Sim** is a distributed microservices architecture designed to simulate the operational constraints of a space-based AI training cluster.
 
-Unlike terrestrial RAG (Retrieval-Augmented Generation) systems, this project explicitly models the physics of the Starcloud architecture: **high-latency uplinks**, **thermal radiative cooling limits**, and **batch-processing power budgets**.
+Unlike terrestrial RAG (Retrieval-Augmented Generation) systems, this project explicitly models the physics of the **Starcloud architecture**: **high-latency uplinks**, **thermal radiative cooling limits**, and **batch-processing power budgets**.
+
+> 📄 **Reference**: This implementation is based on the [Starcloud: A Datacenter in the Sky](https://arxiv.org/abs/2502.00141) white paper, which proposes deploying AI training infrastructure in sun-synchronous orbit to leverage continuous solar power and vacuum cooling.
+
+---
+
+## 📚 Starcloud White Paper Overview
+
+The Starcloud architecture addresses fundamental limitations of terrestrial data centers:
+
+| Challenge | Terrestrial | Starcloud (Orbital) |
+|-----------|-------------|---------------------|
+| **Power** | Grid-limited, carbon footprint | Continuous solar (~1361 W/m²) |
+| **Cooling** | Expensive chillers, water usage | Radiative cooling to 3K space |
+| **Data Transfer** | Fiber optic (low latency) | RF/Optical uplink (high latency) |
+| **Capacity** | Limited by land/permits | Scalable constellation |
+
+### Key Physics Constraints Modeled
+
+1. **Stefan-Boltzmann Thermal Rejection** (White Paper §3.2)
+   - Heat rejection: $P = \epsilon \sigma A T^4$ where $\epsilon = 0.92$, $\sigma = 5.67 \times 10^{-8}$
+   - At 20°C (293K): ~385 W/m² per radiator side
+   - Maximum operating temperature: 80°C before thermal throttling
+
+2. **Data Shuttle Protocol** (White Paper §4.1)
+   - Exabyte-scale datasets cannot be streamed via RF link
+   - Physical storage media launched to orbit on regular cadence
+   - Simulated as packaging delay + launch window scheduling
+
+3. **RF/Optical Link Constraints** (White Paper §4.2)
+   - 500ms–2000ms variable latency (alignment, atmospheric conditions)
+   - 10% packet loss rate (ionospheric interference, LOS events)
+   - Intermittent connectivity windows based on orbital mechanics
 
 ---
 
@@ -165,8 +197,30 @@ docker-compose exec orbital-node pytest tests/
 
 **Key Tests:**
 
-- `test_stefan_boltzmann_accuracy`: Validates that heat rejection matches the Starcloud White Paper calculations ($\sim385 W/m^2$ at $20^{\circ}C$).
-- `test_overheating_trip`: Ensures the system throws a `ThermalThrottlingException` when pushed beyond the $80^{\circ}C$ safety limit.
+- `test_stefan_boltzmann_accuracy`: Validates that heat rejection matches the Starcloud White Paper calculations ($\sim385 W/m^2$ at $20^{\circ}C$). *(White Paper §3.2, Eq. 1)*
+- `test_overheating_trip`: Ensures the system throws a `ThermalThrottlingException` when pushed beyond the $80^{\circ}C$ safety limit. *(White Paper §3.4)*
+
+---
+
+## 📖 References
+
+1. **Starcloud: A Datacenter in the Sky** - [arXiv:2502.00141](https://arxiv.org/abs/2502.00141)
+   - Proposes orbital AI training infrastructure leveraging continuous solar power
+   - Defines thermal constraints and radiator sizing equations
+   - Describes Data Shuttle protocol for exabyte-scale data transfer
+
+2. **Stefan-Boltzmann Law** - Radiative heat transfer in vacuum
+   - $P = \epsilon \sigma A T^4$ governs all thermal calculations
+   - Deep space acts as a 3K heat sink
+
+3. **Microsoft Semantic Kernel** - [GitHub](https://github.com/microsoft/semantic-kernel)
+   - AI orchestration framework used for orbital compute workloads
+
+---
+
+## 📜 License
+
+MIT License - See [LICENSE](LICENSE) for details.
 
 ---
 
