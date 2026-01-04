@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  # Ground Station - FastAPI Service (The Client)
+  ground-station:
+    build:
+      context: ./ground-station
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    networks:
+      - orbital-network
+    depends_on:
+      - uplink-service
+
+  # Uplink Service - Python/Rust Chaos Proxy (The Network Simulator)
+  uplink-service:
+    build:
+      context: ./uplink-service
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    networks:
+      - orbital-network
+
+  # Orbital Node - Semantic Kernel Worker (The Satellite)
+  orbital-node:
+    build:
+      context: ./orbital-node
+      dockerfile: Dockerfile
+    networks:
+      - orbital-network
+    depends_on:
+      - uplink-service
+
+  # Dev Container for development
+  devcontainer:
+    image: mcr.microsoft.com/devcontainers/python:3.11
+    volumes:
+      - ..:/workspace:cached
+    command: sleep infinity
+    networks:
+      - orbital-network
+
+networks:
+  orbital-network:
+    driver: bridge
